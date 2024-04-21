@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Enjoy the Pokemon Memory Game and test your memory skills by matching your favorite Pokemon!">
-  <title>Pokemon Memory Game</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Pokemon Memory Game</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
-    <section id="game-board" aria-label="Game board"></section>
-    <section id="score" role="status">Score: 0</section>
-    <section id="message" role="alert"></section>
-    <div id="timer" role="timer" aria-live="assertive"></div>
-  </main>
-  <script src="app.js" defer></script>
+    <div id="game-board" class="game-board"></div>
+    <div id="timer">Time: <span id="time">40</span> seconds</div>
+    <div id="score">Score: <span id="score-count">0</span></div>
+    <script src="script.js"></script>
 </body>
 </html>
