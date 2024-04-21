@@ -1,0 +1,53 @@
+#game-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.card {
+  width: 150px;
+  height: 200px;
+  background-color: #ccc;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.card img {
+  max-width: 100px;
+  max-height: 100px;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card .back {
+  position: absolute;
+  backface-visibility: hidden;
+}
+
+.card .front {
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+}
+
+#score {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+#message {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 10px;
+}
