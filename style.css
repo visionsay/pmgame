@@ -27,19 +27,24 @@
   max-height: 100px;
 }
 
-.card.flipped {
-  transform: rotateY(180deg);
-}
-
 .card .back, .card .front {
   position: absolute;
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
+  transform-origin: center; /* 카드의 중앙을 기준으로 회전 */
 }
 
 .card .front {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg); /* 초기에 앞면을 뒤집어 놓습니다 */
+}
+
+.card.flipped .front {
+  transform: rotateY(0deg); /* 카드가 flipped 클래스를 가질 때 원래 방향으로 회전 */
+}
+
+.card.flipped .back {
+  transform: rotateY(180deg); /* 카드가 flipped 클래스를 가질 때 뒷면이 보이도록 회전 */
 }
 
 #score {
