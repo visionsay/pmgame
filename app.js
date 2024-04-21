@@ -51,4 +51,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkMatch() {
-        const [card1, card2] = c
+        const [card1, card2] = cardsChosen;
+        if (card1.style.backgroundImage === card2.style.backgroundImage) {
+            score++;
+            scoreDisplay.textContent = score;
+            card1.removeEventListener('click', flipCard);
+            card2.removeEventListener('click', flipCard);
+        } else {
+            card1.style.backgroundImage = '';
+            card2.style.backgroundImage = '';
+        }
+        cardsChosen = [];
+    }
+
+    // 타이머 설정
+    function startTimer() {
+        const timer = setInterval(() => {
+            time--;
+            timerDisplay.textContent = `${time} seconds`;
+            if (time <= 0) {
+                clearInterval(timer);
+                alert('Game over!');
+                cards.forEach(card => card.removeEventListener('click', flipCard));
+            }
+        }, 1000);
+    }
+
+    startTimer();
+    createBoard();
+});
