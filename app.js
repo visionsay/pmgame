@@ -14,57 +14,68 @@ let timer;
 let timeLeft = 40;
 
 const fetchPokemons = async () => {
+  const requests = [];
   for (let i = 1; i <= 16; i++) {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
-    const data = await response.json();
-    pokemons.push(data);
+    requests.push(fetch(`https://pokeapi.co/api/v2/pokemon/${i}`).then(res => res.json()));
   }
-  showCards();
-  setTimeout(createCards, 5000);
+  try {
+    pokemons = await Promise.all(requests);
+    showCards();
+    setTimeout(createCards, 5000);
+  } catch (error) {
+    console.error('Failed to fetch Pokemons:', error);
+  }
 };
 
 const showCards = () => {
+  const fragment = document.createDocumentFragment();
   pokemons.forEach(pokemon => {
-    const card = document.createElement('div');
-    card.classList.add('card');
-    const image = document.createElement('img');
-    image.src = pokemon.sprites.front_default;
-    card.appendChild(image);
-    gameBoard.appendChild(card);
+    const card = createCardElement(pokemon, false);
+    fragment.appendChild(card);
   });
+  gameBoard.appendChild(fragment);
 };
 
 const createCards = () => {
   gameBoard.innerHTML = '';
   const duplicatedPokemons = [...pokemons, ...pokemons];
-  duplicatedPokemons.sort(() => Math.random() - 0.5);
+  shuffleArray(duplicatedPokemons);
 
+  const fragment = document.createDocumentFragment();
   duplicatedPokemons.forEach(pokemon => {
-    const card = document.createElement('div');
-    card.classList.add('card');
-    card.dataset.pokemonId = pokemon.id;
+    const card = createCardElement(pokemon, true);
+    cards.push(card);
+    fragment.appendChild(card);
+  });
+  gameBoard.appendChild(fragment);
 
-    const frontView = document.createElement('div');
-    frontView.classList.add('front');
+  startTimer();
+};
 
-    const image = document.createElement('img');
-    image.src = pokemon.sprites.front_default;
-    frontView.appendChild(image);
+const createCardElement = (pokemon, isPlayable) => {
+  const card = document.createElement('div');
+  card.classList.add('card');
+  card.dataset.pokemonId = pokemon.id;
 
-    const backView = document.createElement('div');
-    backView.classList.add('back');
+  const frontView = document.createElement('div');
+  frontView.classList.add('front');
+  const image = document.createElement('img');
+  image.src = pokemon.sprites.front_default;
+  frontView.appendChild(image);
+
+  const backView = document.createElement('div');
+  backView.classList.add('back');
+  if (isPlayable) {
     const pokemonName = document.createElement('p');
     pokemonName.textContent = pokemon.name;
     backView.appendChild(pokemonName);
-
-    card.appendChild(frontView);
-    card.appendChild(backView);
     card.addEventListener('click', flipCard);
-    cards.push(card);
-    gameBoard.appendChild(card);
-  });
+  }
 
-  startTimer();
+  card.appendChild(frontView);
+  card.appendChild(backView);
+
+  return card;
 };
 
 const flipCard = (e) => {
@@ -106,10 +117,17 @@ const startTimer = () => {
     timerDisplay.textContent = `Time: ${timeLeft}s`;
     if (timeLeft === 0) {
       clearInterval(timer);
-      messageDisplay.textContent = 'Time\'s up! Game over.';
+      messageDisplay.textContent = "Time's up! Game over.";
       cards.forEach(card => card.classList.add('flipped'));
     }
   }, 1000);
+};
+
+const shuffleArray = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]]; // ES6 destructuring swap
+  }
 };
 
 fetchPokemons();
