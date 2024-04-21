@@ -7,17 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let score = 0;
     let time = 40;
 
-    // 포켓몬 데이터 가져오기 및 보드 초기화
     async function fetchPokemon() {
         const baseUrl = 'https://pokeapi.co/api/v2/pokemon/';
         let imageUrls = [];
-        for (let i = 1; i <= 8; i++) { // 8개의 포켓몬
+        for (let i = 1; i <= 8; i++) {
             const res = await fetch(`${baseUrl}${Math.floor(Math.random() * 150) + 1}`);
             const data = await res.json();
             imageUrls.push(data.sprites.front_default);
         }
-        imageUrls = [...imageUrls, ...imageUrls]; // 각 이미지를 두 번 사용
-        imageUrls.sort(() => 0.5 - Math.random()); // 카드 섞기
+        imageUrls = [...imageUrls, ...imageUrls];
+        imageUrls.sort(() => 0.5 - Math.random());
         return imageUrls;
     }
 
@@ -25,58 +24,42 @@ document.addEventListener('DOMContentLoaded', () => {
         const urls = await fetchPokemon();
         urls.forEach((url, index) => {
             const card = document.createElement('div');
-            card.setAttribute('class', 'card');
-            card.setAttribute('data-id', index);
-            card.style.backgroundImage = `url(${url})`;
-            card.addEventListener('click', flipCard);
+            card.setAttribute('class', 'card back');
+            card.dataset.url = url; // 이미지 URL 저장
+            card.dataset.id = index;
             gameBoard.appendChild(card);
             cards.push(card);
         });
         setTimeout(() => {
-            cards.forEach(card => card.style.backgroundImage = '');
-        }, 5000); // 5초 후 모든 카드 뒤집기
+            cards.forEach(card => {
+                card.classList.remove('back');
+                card.style.backgroundImage = `url('${card.dataset.url}')`;
+            });
+            setTimeout(() => {
+                cards.forEach(card => {
+                    card.classList.add('back');
+                    card.style.backgroundImage = '';
+                });
+            }, 5000); // 5초 후 모든 카드 뒤집기
+        }, 500);
     }
 
     function flipCard() {
-        const clickedCard = this;
-        if (!clickedCard.style.backgroundImage) {
-            const cardId = clickedCard.getAttribute('data-id');
-            clickedCard.style.backgroundImage = `url(${urls[cardId]})`;
-            cardsChosen.push(clickedCard);
+        if (!this.classList.contains('back')) return; // 이미 뒤집힌 카드는 무시
+        this.classList.remove('back');
+        this.style.backgroundImage = `url('${this.dataset.url}')`;
+        cardsChosen.push(this);
 
-            if (cardsChosen.length === 2) {
-                setTimeout(checkMatch, 500);
-            }
+        if (cardsChosen.length === 2) {
+            setTimeout(checkMatch, 500);
         }
     }
 
     function checkMatch() {
         const [card1, card2] = cardsChosen;
-        if (card1.style.backgroundImage === card2.style.backgroundImage) {
+        if (card1.dataset.url === card2.dataset.url) {
             score++;
             scoreDisplay.textContent = score;
-            card1.removeEventListener('click', flipCard);
-            card2.removeEventListener('click', flipCard);
         } else {
-            card1.style.backgroundImage = '';
-            card2.style.backgroundImage = '';
-        }
-        cardsChosen = [];
-    }
-
-    // 타이머 설정
-    function startTimer() {
-        const timer = setInterval(() => {
-            time--;
-            timerDisplay.textContent = `${time} seconds`;
-            if (time <= 0) {
-                clearInterval(timer);
-                alert('Game over!');
-                cards.forEach(card => card.removeEventListener('click', flipCard));
-            }
-        }, 1000);
-    }
-
-    startTimer();
-    createBoard();
-});
+            card1.classList.add('back');
+            card2.classList.add('back
